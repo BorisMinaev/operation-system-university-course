@@ -1,18 +1,46 @@
 #include <stdlib.h>
-
+#include <unistd.h>
 int main(int argc, char** argv) {
     if (argc != 2) {
         return -1;
     }
     int k = atoi(argv[1]);
-    char *buffer = (char *) malloc(k + 1);
+    char *buffer = (char *) malloc(k);
+    int from = 0;
+    int now_write = 1;
     while (1) {
-        int r = read(0, buffer, k);
+        int r = read(0, buffer + from, k - from);
         if (r == 0) {
             break;
         }
-        *(buffer + r) = '\n';
-        write(1, buffer, r + 1);
+        from += r;
+        while (1) {
+            int i;
+            int first_next_line = -1;
+            for (i = 0; i < from; i++) {
+                if (*(buffer + i) == '\n') {
+                    first_next_line = i;
+                    break;
+                }
+            }
+            if (first_next_line == -1) {
+                break;
+            }
+            if (now_write) {
+                write(1, buffer, first_next_line + 1);
+                write(1, buffer, first_next_line + 1);
+            }
+            for (i = first_next_line + 1; i < from; i++) {
+                *(buffer + i - first_next_line - 1) = *(buffer + i);
+            }
+            from -= first_next_line + 1;
+            now_write = 1;
+        }
+        if (from == k) {
+            from = 0;
+            now_write = 0;
+        }
+        //write(1, buffer, r + 1);
     }
     free(buffer);
     return 0;
