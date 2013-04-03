@@ -8,6 +8,18 @@ int my_atoi(char* number) {
     return res;
 }
 
+int my_write(int length, char* data) {
+    int wrote = 0;
+    while (wrote < length) {
+        int cur_write = write(1, data + wrote, length - wrote);
+        if (cur_write <= 0) {
+            return 1;
+        }
+        wrote += cur_write;
+    }
+    return 0;
+}
+
 int main(int argc, char** argv) {
     if (argc != 2) {
         return -1;
@@ -38,8 +50,8 @@ int main(int argc, char** argv) {
                 break;
             }
             if (now_write) {
-                write(1, buffer, first_next_line + 1);
-                write(1, buffer, first_next_line + 1);
+                if (my_write(first_next_line + 1, buffer)) return 1;
+                if (my_write(first_next_line + 1, buffer)) return 1;
             }
             for (i = first_next_line + 1; i < from; i++) {
                 *(buffer + i - first_next_line - 1) = *(buffer + i);
