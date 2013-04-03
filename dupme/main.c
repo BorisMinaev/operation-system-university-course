@@ -16,10 +16,13 @@ int main(int argc, char** argv) {
     char *buffer = (char *) malloc(k);
     int from = 0;
     int now_write = 1;
-    while (1) {
+    int eof = 0;
+    while (1 - eof) {
         int r = read(0, buffer + from, k - from);
         if (r == 0) {
-            break;
+            eof = 1;
+            *(buffer + from) = '\n';
+            from++;
         }
         from += r;
         while (1) {
