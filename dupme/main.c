@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <unistd.h>
 int main(int argc, char** argv) {
     if (argc != 2) {
         return -1;
@@ -40,7 +39,6 @@ int main(int argc, char** argv) {
             from = 0;
             now_write = 0;
         }
-        //write(1, buffer, r + 1);
     }
     free(buffer);
     return 0;
