@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 
@@ -9,14 +10,20 @@ char** argv;
 int argc;
 
 void do_main_part(int fr, int len) {
-    int not_need_to_write = 0;
-    char * s = (char*) malloc(len);
-    int i;
+    char * s = (char*) malloc(len +1);
+    int i=0;
     for (i = 0; i < len; i++)
         *(s + i) = *(buffer + fr + i);
+    *(s + len) = 0;
     if (fork() == 0) {
+//        int devnull = open("/dev/null", O_WRONLY | O_CREAT | O_TRUNC |
+ //               S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+  //      int pipefd[2];
+   //     pipe(pipefd);
+    //    dup2(pipefd[1], 1);
         char ** args;
         args = malloc(sizeof(char*) * (argc + 1));
+        int i = optind;
         for (; *(argv + i); i++) {
             if (strcmp(*(argv + i), "{}") == 0) {
                 (*(args + i)) = s;
@@ -25,13 +32,15 @@ void do_main_part(int fr, int len) {
             }
         }
         *(args + argc) = 0;
-        execvp(args[optind], args + optind + 1);
-        printf("fail\n");
+        execvp(args[optind], args + optind);
+        printf("%c\n", **(args + optind + 1));
+        printf("%c\n", *(*(args + optind + 1) + 1));
+        printf("%c\n", *(*(args + optind + 1)+2));
+        printf("%c\n", *(*(args + optind + 1)+3));
         exit(1);
     }
     int status;
     int x = wait(&status);
-    printf("%d\n", status);
     if (WIFEXITED(status) && (WEXITSTATUS(status) == 0)) {
         write(1, buffer + fr, len+1);
     }
