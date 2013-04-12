@@ -1,10 +1,15 @@
 #include <unistd.h>
 
-char delim = '\n';
+char delim = ' ';
 int buf_len = 4 * 1024;
+char *buffer;
+
+void do_main_part(int fr, int len) {
+
+}
 
 int main(int argc, char ** argv) {
-    char*buffer = (char *) mallok(buf_len);
+    buffer = (char *) mallok(buf_len);
     int eof = 0;
     int from = 0;
     while (1 - eof) {
@@ -27,6 +32,7 @@ int main(int argc, char ** argv) {
             if (first_delim == -1) {
                 break;
             }
+            do_main_part(0, first_delim);
             for (int i = first_delim + 1; i < from; i++) {
                 *(buffer + i - first_delim - 1) = *(buffer + i);
             }
