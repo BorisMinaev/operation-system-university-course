@@ -3,13 +3,24 @@
 char delim = ' ';
 int buf_len = 4 * 1024;
 char *buffer;
+char** args;
 
 void do_main_part(int fr, int len) {
+    int not_need_to_write = 0;
+    int child_id;
+    if ((child_id = fork()) == 0) {
+       int i = optid;
+      for (; *(args + i); i++) {
+        if (strcmp(*(argv + i), "{}") == 0) {
+            strcpy
+      } 
+    }
     write(1, buffer + fr, len);
 }
 
 int main(int argc, char ** argv) {
     int c;
+    args = argv;
     while ((c = getopt(argc, argv, "nzb:")) != -1) {
         switch (c)
         {
@@ -20,16 +31,14 @@ int main(int argc, char ** argv) {
                 delim = 0;
                 break;
             case 'b':
-                buf_len = optarg;
+                buf_len = atoi(optarg);
                 break;
             default:
                 abort();
         }
     }
-
-
-
-    buffer = (char *) malloc(buf_len);
+    printf("%d\n", buf_len);
+    buffer = (char *) malloc(buf_len + 1);
     int eof = 0;
     int from = 0;
     while (1 - eof) {
