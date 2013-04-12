@@ -1,26 +1,45 @@
 #include <unistd.h>
+#include <sys/wait.h>
 
-char delim = ' ';
+char delim = '\n';
 int buf_len = 4 * 1024;
 char *buffer;
-char** args;
+char** argv;
+int argcp;
 
 void do_main_part(int fr, int len) {
     int not_need_to_write = 0;
-    int child_id;
-    if ((child_id = fork()) == 0) {
-       int i = optid;
-      for (; *(args + i); i++) {
-        if (strcmp(*(argv + i), "{}") == 0) {
-            strcpy
-      } 
+    char * s = (char*) malloc(len);
+    int i;
+    for (i = 0; i < len; i++)
+        *(s + i) = *(buffer + fr + i);
+    if (fork() == 0) {
+        exit(0);
+        char ** args;
+        args = malloc(sizeof(char*) * argcp);
+        for (; *(argv + i); i++) {
+            if (strcmp(*(argv + i), "{}") == 0) {
+                (*(args + i)) = s;
+            } else {
+                *(args + i) = *(argv + i);
+            }
+        }
+        execv(args[optind], args + optind + 1);
+        exit(1);
     }
-    write(1, buffer + fr, len);
+    int status;
+    int x = wait(&status);
+    printf("%d\n", x);
+    printf("%d\n", status);
+    if (WIFEXITED(status) && (WEXITSTATUS(status) == 0)) {
+        write(1, buffer + fr, len);
+    }
 }
 
-int main(int argc, char ** argv) {
+int main(int argc, char ** argvv) {
     int c;
-    args = argv;
+    argv = argvv;
+    argcp = argc;
     while ((c = getopt(argc, argv, "nzb:")) != -1) {
         switch (c)
         {
@@ -37,7 +56,6 @@ int main(int argc, char ** argv) {
                 abort();
         }
     }
-    printf("%d\n", buf_len);
     buffer = (char *) malloc(buf_len + 1);
     int eof = 0;
     int from = 0;
@@ -61,11 +79,12 @@ int main(int argc, char ** argv) {
             if (first_delim == -1) {
                 break;
             }
-            do_main_part(0, first_delim - 1);
+//            printf("%d\n", first_delim);
+            do_main_part(0, first_delim);
             for (i = first_delim + 1; i < from; i++) {
                 *(buffer + i - first_delim - 1) = *(buffer + i);
             }
-            from -= first_delim - 1;
+            from -= first_delim + 1;
         }
         if (from == buf_len) {
             return 1;
