@@ -1,11 +1,12 @@
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/wait.h>
 
 char delim = '\n';
 int buf_len = 4 * 1024;
 char *buffer;
 char** argv;
-int argcp;
+int argc;
 
 void do_main_part(int fr, int len) {
     int not_need_to_write = 0;
@@ -14,9 +15,8 @@ void do_main_part(int fr, int len) {
     for (i = 0; i < len; i++)
         *(s + i) = *(buffer + fr + i);
     if (fork() == 0) {
-        exit(0);
         char ** args;
-        args = malloc(sizeof(char*) * argcp);
+        args = malloc(sizeof(char*) * (argc + 1));
         for (; *(argv + i); i++) {
             if (strcmp(*(argv + i), "{}") == 0) {
                 (*(args + i)) = s;
@@ -24,22 +24,23 @@ void do_main_part(int fr, int len) {
                 *(args + i) = *(argv + i);
             }
         }
-        execv(args[optind], args + optind + 1);
+        *(args + argc) = 0;
+        execvp(args[optind], args + optind + 1);
+        printf("fail\n");
         exit(1);
     }
     int status;
     int x = wait(&status);
-    printf("%d\n", x);
     printf("%d\n", status);
     if (WIFEXITED(status) && (WEXITSTATUS(status) == 0)) {
-        write(1, buffer + fr, len);
+        write(1, buffer + fr, len+1);
     }
 }
 
-int main(int argc, char ** argvv) {
-    int c;
+int main(int argcc, char** argvv) {
     argv = argvv;
-    argcp = argc;
+    int c;
+    argc = argcc;
     while ((c = getopt(argc, argv, "nzb:")) != -1) {
         switch (c)
         {
@@ -79,7 +80,6 @@ int main(int argc, char ** argvv) {
             if (first_delim == -1) {
                 break;
             }
-//            printf("%d\n", first_delim);
             do_main_part(0, first_delim);
             for (i = first_delim + 1; i < from; i++) {
                 *(buffer + i - first_delim - 1) = *(buffer + i);
