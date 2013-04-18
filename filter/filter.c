@@ -10,17 +10,18 @@ char** argv;
 int argc;
 
 void do_main_part(int fr, int len) {
+    printf("Do MAIN PART\n");
     char * s = (char*) malloc(len +1);
     int i=0;
     for (i = 0; i < len; i++)
         *(s + i) = *(buffer + fr + i);
     *(s + len) = 0;
     if (fork() == 0) {
-//        int devnull = open("/dev/null", O_WRONLY | O_CREAT | O_TRUNC |
- //               S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-  //      int pipefd[2];
-   //     pipe(pipefd);
-    //    dup2(pipefd[1], 1);
+        int devnull = open("/dev/null", O_WRONLY | O_CREAT | O_TRUNC |
+                S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+        int pipefd[2];
+        pipe(pipefd);
+        dup2(pipefd[1], 1);
         char ** args;
         args = malloc(sizeof(char*) * (argc + 1));
         int i = optind;
@@ -33,16 +34,14 @@ void do_main_part(int fr, int len) {
         }
         *(args + argc) = 0;
         execvp(args[optind], args + optind);
-        printf("%c\n", **(args + optind + 1));
-        printf("%c\n", *(*(args + optind + 1) + 1));
-        printf("%c\n", *(*(args + optind + 1)+2));
-        printf("%c\n", *(*(args + optind + 1)+3));
         exit(1);
     }
     int status;
     int x = wait(&status);
     if (WIFEXITED(status) && (WEXITSTATUS(status) == 0)) {
+        *(buffer + fr + len) = '\n';
         write(1, buffer + fr, len+1);
+        *(buffer + fr + len) = delim;
     }
 }
 
@@ -81,7 +80,7 @@ int main(int argcc, char** argvv) {
             int i;
             int first_delim = -1;
             for (i = 0; i < from; i++) {
-                if (*(buffer + i) == '\n') {
+                if (*(buffer + i) == delim) {
                     first_delim = i;
                     break;
                 }
