@@ -1,0 +1,11 @@
+#!/bin/bash
+
+foo() {
+    echo "foo"
+}
+
+
+foo
+foo
+foo
+
