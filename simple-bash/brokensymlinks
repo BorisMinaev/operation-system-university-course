@@ -1,11 +1,12 @@
 #!/bin/bash
 
 foo() {
-    echo "foo"
+    if [ $1 -ne "0" ] ; then
+        val=$1
+        echo $val
+        let "val=$val - 1"
+        foo $val
+    fi
 }
 
-
-foo
-foo
-foo
-
+foo 5 
