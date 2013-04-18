@@ -11,12 +11,25 @@ void remove_files() {
     remove(cur);
 }
 
+void my_exit() {
+    remove_files();
+    puts("by!");
+    _exit(0);
+}
+
 
 int main(int argc, char ** argv) {
-    int ff = open(last, O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
-    int f22= open(cur, O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
-    close(ff);
-    close(f22);
+    close(open(last, O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO));
+    close(open(cur, O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO));
 
+    signal(SIGINT, my_exit);
+    signal(SIGTERM, my_exit);
+
+    while (1) {
+       sleep(1);
+      puts("Hello, world");
+    } 
+
+    remove_files();
     return 0;
 }
