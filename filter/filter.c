@@ -10,7 +10,6 @@ char** argv;
 int argc;
 
 void do_main_part(int fr, int len) {
-    printf("Do MAIN PART\n");
     char * s = (char*) malloc(len +1);
     int i=0;
     for (i = 0; i < len; i++)
