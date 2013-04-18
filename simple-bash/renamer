@@ -1,11 +1,10 @@
 #!/bin/bash
 
-allfiles=$@
-
-for file in $allfiles ; do
+for file in "$@" ; do
+    [ -e "$file" ] || continue
     echo $file
     read newname
-    if [ newname ] ; then
-        mv $file $newname
+    if [ "$newname" ] ; then
+        mv "$file" "$newname"
     fi
 done
