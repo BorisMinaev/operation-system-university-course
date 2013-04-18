@@ -1,6 +1,15 @@
 #!/bin/bash
 
+time=$1
+shift
+oldoutput=""
+
 while [ : ] ; do
-    echo "hi"
-    sleep "$1"
+    newoutput=$($@)
+    echo "$newoutput" 
+    if [ "$oldoutput" ] ; then
+       diff -u <(echo "$oldoutput") <(echo "$newoutput") 
+    fi
+    oldoutput="$newoutput"
+    sleep "$time"
 done
