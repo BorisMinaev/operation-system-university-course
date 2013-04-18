@@ -1,12 +1,29 @@
 #!/bin/bash
 
-foo() {
-    if [ $1 -ne "0" ] ; then
-        val=$1
-        echo $val
-        let "val=$val - 1"
-        foo $val
+check_symlink() {
+    if [[ -L "$1" && ! -e "$1" ]] ; then
+        echo "$PWD/$1"
     fi
 }
 
-foo 5 
+
+check_dir() {
+    pushd "$1" > /dev/null 
+    for file in * ; do
+        if [[ -L "$file" ]] ; then
+            check_symlink "$file"
+        else 
+            if [[ -d "$file" ]] ; then
+                check_dir "$file"
+            fi
+        fi
+    done
+    popd > /dev/null
+}
+
+for filename in "$@" ; do
+    check_symlink "$filename"
+    if [[ -d "$filename" ]] ; then
+        check_dir $filename
+    fi
+done 
