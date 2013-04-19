@@ -39,6 +39,10 @@ int main(int argc, char ** argv) {
     }
     buffer = (char *) malloc(buf_len);
     file_r = open(argv[1], O_RDONLY);
+    if (file_r == -1) {
+        puts("Error while opening file");
+        my_exit(1);
+    }
     int lines_read = 0;
     int string_number = atoi(argv[2]);
     string_number--;
