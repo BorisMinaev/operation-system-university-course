@@ -69,6 +69,10 @@ int main(int argc, char ** argv) {
         }
     }
     if (lines_read < string_number) {
+        while (lines_read < string_number) {
+            lines_read++;
+            puts("");
+        }
         my_print(argv[3], str_len(argv[3]));
         puts("");
     }
