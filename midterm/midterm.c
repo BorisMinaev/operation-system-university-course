@@ -36,10 +36,12 @@ int main(int argc, char ** argv) {
         _exit(1);
     }
     buffer = (char *) malloc(buf_len);
-    char * str_test = "abcd\n";
-    my_print(str_test, 5);
-
-
-
+    int file_r = open(argv[1], O_RDWR);
+    while (1) {
+        int re = read(file_r, buffer, buf_len);
+        if (re < 0) my_exit(1);
+        if (re == 0) break;
+        printf("%d\n", re);
+    }
     my_exit(0);
 }
