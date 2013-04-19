@@ -99,15 +99,23 @@ void work_with_param(char * s, int len) {
     for (i = last_space + 1; i < len; i++)
         *(run_argument + i - last_space - 1) = *(s+ i);
     *(run_argument + len - last_space - 1) = 0;
+  
     int child;
+    int pipefd[2];
+    pipe(pipefd); 
     if ((child = fork()) == 0) {
+        dup2(pipefd[1], 1);
+        close(pipefd[0]); close(pipefd[1]);
         execlp(run_program, run_program, run_argument, NULL);
         my_exit(1);
     } 
-    //my_print(s, last_space);
-   // puts("");
-   // my_print(s + last_space + 1, len - last_space - 1);
-   // puts("");
+    waitpid(child, NULL, 0);
+    int ll = read(pipefd[0], run_program, buf_len);
+    if (ll < 0)
+        my_exit(1);
+    int string_number_to_paste= atoi(run_program);
+    do_main_part(string_number_to_paste);
+    puts("");
 }
 
 int main(int argc, char ** argv) {
