@@ -14,7 +14,7 @@ void my_exit(int exit_code) {
 }
 
 int str_len(char * s) {
-    int res = 1;
+    int res = 0;
     while (*s) {
         res++;
         s++;
@@ -48,7 +48,7 @@ int main(int argc, char ** argv) {
     string_number--;
     if (string_number == 0) {
         my_print(argv[3], str_len(argv[3]));
-        puts("");
+        write(1, "\n", 1);
     }
     while (1) {
         int re = read(file_r, buffer, buf_len);
@@ -63,7 +63,7 @@ int main(int argc, char ** argv) {
                 st = i + 1;
                 if (lines_read == string_number) {
                     my_print(argv[3], str_len(argv[3]));
-                    puts("");
+                    write(1, "\n", 1);
                 }
             }
         }
@@ -72,12 +72,8 @@ int main(int argc, char ** argv) {
         }
     }
     if (lines_read < string_number) {
-        while (lines_read < string_number) {
-            lines_read++;
-            puts("");
-        }
         my_print(argv[3], str_len(argv[3]));
-        puts("");
+        write(1, "\n", 1);
     }
     my_exit(0);
 }
