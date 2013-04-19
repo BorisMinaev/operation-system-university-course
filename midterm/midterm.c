@@ -1,7 +1,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
-#include <signal.h>
 
 int buf_len = 100;
 char * buffer;
@@ -39,7 +38,7 @@ int main(int argc, char ** argv) {
         _exit(1);
     }
     buffer = (char *) malloc(buf_len);
-    file_r = open(argv[1], O_RDWR);
+    file_r = open(argv[1], O_RDONLY);
     int lines_read = 0;
     int string_number = atoi(argv[2]);
     string_number--;
