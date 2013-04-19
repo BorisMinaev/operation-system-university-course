@@ -82,7 +82,17 @@ void do_main_part(int string_number) {
 }
 
 void work_with_param(char * s, int len) {
-    my_print(s, len);
+    int last_space = -1;
+    int i = 0;
+    for (i = 0; i < len; i++)
+        if ((*(s+i)) == ' ') 
+            last_space = i;
+    if (last_space == -1)
+        my_exit(1);
+    my_print(s, last_space);
+    puts("");
+    my_print(s + last_space + 1, len - last_space - 1);
+    puts("");
 }
 
 int main(int argc, char ** argv) {
@@ -119,9 +129,10 @@ int main(int argc, char ** argv) {
             if (first_endl == -1 && already == buf_len) 
                 my_exit(1);
             if (first_endl != -1) {
-                work_with_param(buffer_to_run, first_endl
-                for (int i = first_endl + 1; i < already; i++)
-                    *(buffer + i - first_endl - 1) = *(buffer + i);
+                work_with_param(buffer_to_run, first_endl);
+                for (i = first_endl + 1; i < already; i++)
+                    *(buffer_to_run + i - first_endl - 1) = *(buffer_to_run + i);
+                already -= first_endl + 1;
             } else {
                 break;
             } 
