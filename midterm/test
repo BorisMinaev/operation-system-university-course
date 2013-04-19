@@ -1,0 +1,14 @@
+#!/bin/bash
+
+let "line_number=1"
+while [ : ] ; do
+    echo "insert into line $line_number"
+    ./midterm "tests/test.txt" $line_number "a new line" > tests/cprogramout.txt
+    sed $line_number'i a new line' tests/test.txt > tests/sedprogramout.txt
+    diff "tests/cprogramout.txt" "tests/sedprogramout.txt" > /dev/null
+    if [[ $? -ne 0 ]] ; then
+        echo "fail..."
+    fi
+    let "line_number=$line_number+1"
+    [ $line_number -lt 10 ] || break
+done
