@@ -6,12 +6,16 @@ int buf_len = 100;
 char * buffer_to_run;
 char * buffer;
 char * string_to_write;
+char * run_program;
+char * run_argument;
 int file_r = -1;
 int file_to_run = -1;
 
 void my_exit(int exit_code) {
     free(buffer);
     free(buffer_to_run);
+    free(run_program);
+    free(run_argument);
     if (file_r != -1)
         close(file_r);
     if (file_to_run != -1)
@@ -89,10 +93,21 @@ void work_with_param(char * s, int len) {
             last_space = i;
     if (last_space == -1)
         my_exit(1);
-    my_print(s, last_space);
-    puts("");
-    my_print(s + last_space + 1, len - last_space - 1);
-    puts("");
+    for (i = 0; i < last_space; i++)
+        *(run_program + i) = *(s + i);
+    *(run_program + last_space) = 0;
+    for (i = last_space + 1; i < len; i++)
+        *(run_argument + i - last_space - 1) = *(s+ i);
+    *(run_argument + len - last_space - 1) = 0;
+    int child;
+    if ((child = fork()) == 0) {
+        execlp(run_program, run_program, run_argument, NULL);
+        my_exit(1);
+    } 
+    //my_print(s, last_space);
+   // puts("");
+   // my_print(s + last_space + 1, len - last_space - 1);
+   // puts("");
 }
 
 int main(int argc, char ** argv) {
@@ -102,6 +117,8 @@ int main(int argc, char ** argv) {
     }
     buffer = (char *) malloc(buf_len);
     buffer_to_run = (char *) malloc(buf_len);
+    run_program = (char *) malloc(buf_len);
+    run_argument = (char *) malloc(buf_len);
     file_to_run = open(argv[1], O_RDONLY);
     file_to_change = argv[2];
     string_to_write = argv[3];
