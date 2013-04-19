@@ -1,14 +1,27 @@
 #!/bin/bash
 
 let "line_number=1"
+lines_in_file=`(cat tests/test.txt | wc -l)`
+let "lines_in_file = lines_in_file + 1"
 while [ : ] ; do
     echo "insert into line $line_number"
+    
     ./midterm "tests/test.txt" $line_number "a new line" > tests/cprogramout.txt
-    sed $line_number'i a new line' tests/test.txt > tests/sedprogramout.txt
+
+    if [[ $line_number -lt $lines_in_file ]] ; then
+        sed $line_number'i a new line' tests/test.txt > tests/sedprogramout.txt
+    else
+        cp "tests/test.txt" "tests/sedprogramout.txt"
+        echo "a new line" >> "tests/sedprogramout.txt"
+    fi
+
     diff "tests/cprogramout.txt" "tests/sedprogramout.txt" > /dev/null
     if [[ $? -ne 0 ]] ; then
         echo "fail..."
+    else 
+        echo "ok"
     fi
+
     let "line_number=$line_number+1"
     [ $line_number -lt 10 ] || break
 done
