@@ -5,15 +5,18 @@
 
 int buf_len = 100;
 char * buffer;
+int file_r = -1;
 
 void my_exit(int exit_code) {
     free(buffer);
+    if (file_r != -1)
+        close(file_r);
     _exit(exit_code);
 }
 
-int string_len(char * s) {
+int str_len(char * s) {
     int res = 1;
-    while (!s) {
+    while (*s) {
         res++;
         s++;
     }
@@ -36,12 +39,38 @@ int main(int argc, char ** argv) {
         _exit(1);
     }
     buffer = (char *) malloc(buf_len);
-    int file_r = open(argv[1], O_RDWR);
+    file_r = open(argv[1], O_RDWR);
+    int lines_read = 0;
+    int string_number = atoi(argv[2]);
+    string_number--;
+    if (string_number == 0) {
+        my_print(argv[3], str_len(argv[3]));
+        puts("");
+    }
     while (1) {
         int re = read(file_r, buffer, buf_len);
         if (re < 0) my_exit(1);
         if (re == 0) break;
-        printf("%d\n", re);
+        int i = 0;
+        int st = 0;
+        for (i = 0; i < re; i++) {
+            if ((*(buffer + i)) == '\n') {
+                lines_read++;
+                my_print(buffer + st, i - st + 1);
+                st = i + 1;
+                if (lines_read == string_number) {
+                    my_print(argv[3], str_len(argv[3]));
+                    puts("");
+                }
+            }
+        }
+        if (st != re) {
+            my_print(buffer + st, re - st);
+        }
+    }
+    if (lines_read < string_number) {
+        my_print(argv[3], str_len(argv[3]));
+        puts("");
     }
     my_exit(0);
 }
