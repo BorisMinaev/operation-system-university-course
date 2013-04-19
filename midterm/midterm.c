@@ -50,7 +50,7 @@ void do_main_part(int string_number, struct data d) {
     d.file_r = open(d.file_to_change, O_RDONLY);
     if (d.file_r == -1) {
         puts("Error while reading file");
-        my_exit(1);
+        my_exit(1, d);
     }
     int lines_read = 0;
     string_number--;
@@ -60,14 +60,14 @@ void do_main_part(int string_number, struct data d) {
     }
     while (1) {
         int re = read(d.file_r, d.buffer, buf_len);
-        if (re < 0) my_exit(1);
+        if (re < 0) my_exit(1, d);
         if (re == 0) break;
         int i = 0;
         int st = 0;
         for (i = 0; i < re; i++) {
             if ((*(d.buffer + i)) == '\n') {
                 lines_read++;
-                my_print(d.buffer + st, i - st + 1);
+                my_print(d.buffer + st, i - st + 1, d);
                 st = i + 1;
                 if (lines_read == string_number) {
                     my_print(d.string_to_write, str_len(d.string_to_write), d);
@@ -109,12 +109,12 @@ void work_with_param(char * s, int len, struct data d) {
         dup2(pipefd[1], 1);
         close(pipefd[0]); close(pipefd[1]);
         execlp(d.run_program, d.run_program, d.run_argument, NULL);
-        my_exit(1);
+        my_exit(1, d);
     } 
     waitpid(child, NULL, 0);
-    int ll = read(pipefd[0], d.run_program, d.buf_len);
+    int ll = read(pipefd[0], d.run_program, buf_len);
     if (ll < 0)
-        my_exit(1);
+        my_exit(1, d);
     int string_number_to_paste= atoi(d.run_program);
     do_main_part(string_number_to_paste, d);
     puts("");
@@ -125,7 +125,7 @@ int main(int argc, char ** argv) {
         puts("Usage: midterm filename_to_run filename_to_change new_string");
         _exit(1);
     }
-    data d;
+    struct data d;
     d.file_r = -1;
     d.file_to_run = -1;
     d.buffer = (char *) malloc(buf_len);
@@ -135,7 +135,7 @@ int main(int argc, char ** argv) {
     d.file_to_run = open(argv[1], O_RDONLY);
     d.file_to_change = argv[2];
     d.string_to_write = argv[3];
-    if (file_to_run == -1) {
+    if (d.file_to_run == -1) {
         puts("Error while opening file");
         my_exit(1, d);
     }
@@ -144,7 +144,7 @@ int main(int argc, char ** argv) {
     while (1) {
         int re = read(d.file_to_run, d.buffer_to_run + already, buf_len - already);
         if (re < 0) 
-            my_exit(1);
+            my_exit(1, d);
         if (re == 0)
             eof = 1;
         already += re;
