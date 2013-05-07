@@ -7,44 +7,51 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
+char ** get_args(std::vector<std::vector<char> > cur_program) {
+    char ** arguments = (char **) malloc(cur_program.size() + 1);
+    arguments[cur_program.size()] = NULL;
+    int arg_id;
+    for (arg_id = 0; arg_id < cur_program.size(); arg_id++) {
+        char * cur_arg = (char *) malloc(cur_program[arg_id].size() + 1);
+        cur_arg[cur_program[arg_id].size()] = 0;
+        int ch;
+        for (ch = 0; ch < cur_program[arg_id].size(); ch++)
+            cur_arg[ch] = cur_program[arg_id][ch];
+        arguments[arg_id] = cur_arg;
+    }
+    return arguments;
+}
+
 void do_main_part(std::vector<std::vector<std::vector<char> > > data) {
     int pr_id = 0;
     int last_pipe[2];
     for (pr_id = 0; pr_id < data.size(); pr_id++) {
         std::vector<std::vector<char> > cur_program = data[pr_id];
-        char ** arguments = (char **) malloc(cur_program.size() + 1);
-        arguments[cur_program.size()] = NULL;
-        int arg_id;
-        for (arg_id = 0; arg_id < cur_program.size(); arg_id++) {
-            char * cur_arg = (char *) malloc(cur_program[arg_id].size() + 1);
-            cur_arg[cur_program[arg_id].size()] = 0;
-            int ch;
-            for (ch = 0; ch < cur_program[arg_id].size(); ch++)
-                cur_arg[ch] = cur_program[arg_id][ch];
-            arguments[arg_id] = cur_arg;
-        }
-
+        char ** arguments = get_args(cur_program);
         int new_pipe[2];
-        pipe(new_pipe);
+        if (pr_id != data.size() - 1) {
+            pipe(new_pipe);
+        }
         int child;
         if (!(child = fork())) {
             if (pr_id != data.size() - 1) {
                 dup2(new_pipe[1], 1);
+                close(new_pipe[0]);
+                close(new_pipe[1]);
             }
-            close(new_pipe[0]);
-            close(new_pipe[1]);
             if (pr_id != 0) {
                 dup2(last_pipe[0], 0);
                 close(last_pipe[0]);
-                close(last_pipe[1]);
             }
             execvp(arguments[0], arguments);
             _exit(1);
         }
-        close(new_pipe[1]);
+        if (pr_id != data.size() - 1)
+            close(new_pipe[1]);
         waitpid(child, NULL, 0);
         last_pipe[0] = new_pipe[0];
         last_pipe[1] = new_pipe[1];
+        int arg_id;
         for (arg_id = 0; arg_id < data[pr_id].size(); arg_id++) {
             free(arguments[arg_id]);
         }
