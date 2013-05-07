@@ -10,7 +10,7 @@
 void do_main_part(std::vector<std::vector<std::vector<char> > > data) {
     int pr_id = 0;
     int last_pipe[2];
-    //printf("%d###\n", data.size());
+//    printf("%d###\n", data.size());
     for (pr_id = 0; pr_id < data.size(); pr_id++) {
         std::vector<std::vector<char> > cur_program = data[pr_id];
         char ** arguments = (char **) malloc(cur_program.size());
@@ -46,10 +46,11 @@ void do_main_part(std::vector<std::vector<std::vector<char> > > data) {
                 close(last_pipe[1]);
             }
             execvp(arguments[0], arguments);
-            //execlp("grep", "grep", "abc", NULL);
             _exit(1);
         }
+        printf("WAIT\n");
         waitpid(child, NULL, 0);
+        printf("WAIT END\n");
         last_pipe[0] = new_pipe[0];
         last_pipe[1] = new_pipe[1];
         for (arg_id = 0; arg_id < data[pr_id].size(); arg_id++) {
@@ -112,5 +113,5 @@ int main(int argc, char** argv) {
     }
     free(buffer);
     do_main_part(data);
-//    printf("buy!\n");
+    printf("buy!\n");
 }
