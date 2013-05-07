@@ -5,6 +5,28 @@
 #include <vector>
 #include <string.h>
 
+void do_main_part(std::vector<std::vector<std::vector<char> > > data) {
+    int pr_id = 0;
+    for (pr_id = 0; pr_id < data.size(); pr_id++) {
+        std::vector<std::vector<char> > cur_program = data[pr_id];
+        char ** arguments = (char **) malloc(cur_program.size());
+        int arg_id;
+        for (arg_id = 0; arg_id < data[pr_id].size(); arg_id++) {
+            char * cur_arg = (char *) malloc(cur_program[arg_id].size() + 1);
+            cur_arg[cur_program[arg_id].size()] = 0;
+            int ch;
+            for (ch = 0; ch < cur_program[arg_id].size(); ch++)
+                cur_arg[ch] = cur_program[arg_id][ch];
+            arguments[arg_id] = cur_arg;
+        }
+        printf("PRORGAM #%d", pr_id);
+        for (arg_id = 0; arg_id < data[pr_id].size(); arg_id++) {
+            write(1, arguments[arg_id], strlen(arguments[arg_id]));
+            printf("\n");
+        }
+    } 
+}
+
 int main(int argc, char** argv) {
     if (argc != 2) {
         _exit(1);
@@ -49,14 +71,5 @@ int main(int argc, char** argv) {
         }
     }
     free(buffer);
-    printf("%d\n", data.size());
-    int i;
-    for (i = 0; i < data.size(); i++) {
-        printf("%d\n", data[i].size());
-        int j;
-        for (j = 0; j < data[i].size(); j++)
-            printf("%d ", data[i][j].size());
-        printf("\n");
-    }
-
+    do_main_part(data);
 }
