@@ -10,11 +10,12 @@
 void do_main_part(std::vector<std::vector<std::vector<char> > > data) {
     int pr_id = 0;
     int last_pipe[2];
+    //printf("%d###\n", data.size());
     for (pr_id = 0; pr_id < data.size(); pr_id++) {
         std::vector<std::vector<char> > cur_program = data[pr_id];
         char ** arguments = (char **) malloc(cur_program.size());
         int arg_id;
-        for (arg_id = 0; arg_id < data[pr_id].size(); arg_id++) {
+        for (arg_id = 0; arg_id < cur_program.size(); arg_id++) {
             char * cur_arg = (char *) malloc(cur_program[arg_id].size() + 1);
             cur_arg[cur_program[arg_id].size()] = 0;
             int ch;
@@ -22,6 +23,13 @@ void do_main_part(std::vector<std::vector<std::vector<char> > > data) {
                 cur_arg[ch] = cur_program[arg_id][ch];
             arguments[arg_id] = cur_arg;
         }
+        /*
+        printf("%d\n", cur_program.size());
+        for (arg_id = 0; arg_id < cur_program.size(); arg_id++) {
+            write(1, arguments[arg_id], strlen(arguments[arg_id]));
+            printf("\n");
+        }
+        */
 
         int new_pipe[2];
         pipe(new_pipe);
@@ -38,6 +46,7 @@ void do_main_part(std::vector<std::vector<std::vector<char> > > data) {
                 close(last_pipe[1]);
             }
             execvp(arguments[0], arguments);
+            //execlp("grep", "grep", "abc", NULL);
             _exit(1);
         }
         waitpid(child, NULL, 0);
@@ -47,11 +56,16 @@ void do_main_part(std::vector<std::vector<std::vector<char> > > data) {
             free(arguments[arg_id]);
         }
         free(arguments);
+        //printf("%d!!\n", pr_id);
     } 
     
 }
 
 int main(int argc, char** argv) {
+    //if (fork() == 0) {
+    //execlp("grep", "grep", "abc", NULL);
+    //}
+    //_exit(0);
     if (argc != 2) {
         _exit(1);
     }
@@ -71,6 +85,7 @@ int main(int argc, char** argv) {
         }
         if (re == 0) 
             break;
+        //printf("READ %d bytes\n", re);
         for (int i = 0; i < re; i++) {
             char c = *(buffer + i);
             if (c == 0) {
@@ -81,6 +96,7 @@ int main(int argc, char** argv) {
                 }
             } else {
                 if (is_new_pipe) {
+                   // printf("NEW PIPE IN SYMBOL %d\n", i);
                     std::vector<std::vector<char> > tmp;
                     data.push_back(tmp);
                     is_new_pipe = 0;
@@ -96,4 +112,5 @@ int main(int argc, char** argv) {
     }
     free(buffer);
     do_main_part(data);
+//    printf("buy!\n");
 }
