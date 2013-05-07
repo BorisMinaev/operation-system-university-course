@@ -48,9 +48,9 @@ void do_main_part(std::vector<std::vector<std::vector<char> > > data) {
             execvp(arguments[0], arguments);
             _exit(1);
         }
-        printf("WAIT\n");
+        //printf("WAIT\n");
         waitpid(child, NULL, 0);
-        printf("WAIT END\n");
+        //printf("WAIT END\n");
         last_pipe[0] = new_pipe[0];
         last_pipe[1] = new_pipe[1];
         for (arg_id = 0; arg_id < data[pr_id].size(); arg_id++) {
@@ -113,5 +113,5 @@ int main(int argc, char** argv) {
     }
     free(buffer);
     do_main_part(data);
-    printf("buy!\n");
+    //printf("buy!\n");
 }
