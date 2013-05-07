@@ -41,6 +41,7 @@ void do_main_part(std::vector<std::vector<std::vector<char> > > data) {
             execvp(arguments[0], arguments);
             _exit(1);
         }
+        close(new_pipe[1]);
         waitpid(child, NULL, 0);
         last_pipe[0] = new_pipe[0];
         last_pipe[1] = new_pipe[1];
