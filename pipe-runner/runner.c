@@ -4,9 +4,12 @@
 #include <fcntl.h>
 #include <vector>
 #include <string.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 
 void do_main_part(std::vector<std::vector<std::vector<char> > > data) {
     int pr_id = 0;
+    int last_pipe[2];
     for (pr_id = 0; pr_id < data.size(); pr_id++) {
         std::vector<std::vector<char> > cur_program = data[pr_id];
         char ** arguments = (char **) malloc(cur_program.size());
@@ -19,12 +22,33 @@ void do_main_part(std::vector<std::vector<std::vector<char> > > data) {
                 cur_arg[ch] = cur_program[arg_id][ch];
             arguments[arg_id] = cur_arg;
         }
-        printf("PRORGAM #%d", pr_id);
-        for (arg_id = 0; arg_id < data[pr_id].size(); arg_id++) {
-            write(1, arguments[arg_id], strlen(arguments[arg_id]));
-            printf("\n");
+
+        int new_pipe[2];
+        pipe(new_pipe);
+        int child;
+        if (!(child = fork())) {
+            if (pr_id != data.size() - 1) {
+                dup2(new_pipe[1], 1);
+            }
+            close(new_pipe[0]);
+            close(new_pipe[1]);
+            if (pr_id != 0) {
+                dup2(last_pipe[0], 0);
+                close(last_pipe[0]);
+                close(last_pipe[1]);
+            }
+            execvp(arguments[0], arguments);
+            _exit(1);
         }
+        waitpid(child, NULL, 0);
+        last_pipe[0] = new_pipe[0];
+        last_pipe[1] = new_pipe[1];
+        for (arg_id = 0; arg_id < data[pr_id].size(); arg_id++) {
+            free(arguments[arg_id]);
+        }
+        free(arguments);
     } 
+    
 }
 
 int main(int argc, char** argv) {
