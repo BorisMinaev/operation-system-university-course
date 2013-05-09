@@ -8,7 +8,7 @@
 #include <sys/types.h>
 
 char ** get_args(std::vector<std::vector<char> > cur_program) {
-    char ** arguments = (char **) malloc(cur_program.size() + 1);
+    char ** arguments = (char **) malloc(sizeof(char *) * (cur_program.size() + 1));
     arguments[cur_program.size()] = NULL;
     int arg_id;
     for (arg_id = 0; arg_id < cur_program.size(); arg_id++) {
