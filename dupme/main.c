@@ -1,12 +1,6 @@
 #include <stdlib.h>
-
-int my_atoi(char* number) {
-    int res = 0;
-    while (*number) {
-        res = res * 10 + (*number++) - '0';
-    }
-    return res;
-}
+#include <unistd.h>
+#include <string.h>
 
 int my_write(int length, char* data) {
     int wrote = 0;
@@ -24,7 +18,7 @@ int main(int argc, char** argv) {
     if (argc != 2) {
         return -1;
     }
-    int k = my_atoi(argv[1]) + 1;
+    int k = atoi(argv[1]) + 1;
     char *buffer = (char *) malloc(k);
     int from = 0;
     int now_write = 1;
